@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --ink: #27233b;
+  --muted: #746f86;
+  --coral: #f06459;
+  --coral-deep: #d94d49;
+  --lilac: #eee9ff;
+  --butter: #fff3c8;
+  --paper: #fffdf9;
+}
+
+body {
+  @apply min-h-screen antialiased;
+  color: var(--ink);
+  background-color: #fffaf3;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(240, 100, 89, 0.12) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 86% 8%, rgba(104, 91, 184, 0.12) 0 2px, transparent 2.5px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 224, 0.8));
+  background-size: 42px 42px, 58px 58px, 100% 100%;
+}
+
+::selection {
+  background: #f8b4a9;
+  color: var(--ink);
+}
+
+.birthday-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.birthday-shell::before,
+.birthday-shell::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  width: 9px;
+  height: 22px;
+  border-radius: 2px;
+  transform: rotate(28deg);
+  opacity: 0.72;
+}
+
+.birthday-shell::before {
+  top: 150px;
+  left: 4%;
+  background: var(--coral);
+  box-shadow: 36px 92px #8d83ce, 90px -56px #f6c85f, 78vw 18px #8bc5b0;
+}
+
+.birthday-shell::after {
+  top: 260px;
+  right: 5%;
+  background: #8d83ce;
+  box-shadow: -42px 130px #f6c85f, -86px 36px var(--coral), -72vw 90px #8bc5b0;
+  transform: rotate(-34deg);
+}
+
+.rise-in {
+  animation: rise-in 600ms ease both;
+}
+
+.rise-in-delay {
+  animation: rise-in 600ms 100ms ease both;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}

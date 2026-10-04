@@ -1,0 +1,20 @@
+name: Daily birthday SMS
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  send-birthday-messages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger birthday check
+        env:
+          NEXTJS_API_URL: ${{ secrets.NEXTJS_API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request GET \
+            --header "Authorization: Bearer ${CRON_SECRET}" \
+            "${NEXTJS_API_URL}/api/check-birthdays"
