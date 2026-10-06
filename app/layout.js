@@ -1,14 +1,18 @@
 import "./globals.css";
+import Footer from "../components/Footer";
 
 export const metadata = {
-  title: "Birthday Automation Gateway",
-  description: "Automate birthday SMS messages with Textbee."
+  title: "WishCron | Never Miss A Birthday Again",
+  description: "Schedule personalized birthday wishes and send them automatically by SMS."
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

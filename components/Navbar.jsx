@@ -1,4 +1,17 @@
-export default function Navbar() {
+"use client";
+
+import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabase-client";
+
+export default function Navbar({ userEmail }) {
+  const router = useRouter();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.replace("/");
+    router.refresh();
+  }
+
   return (
     <header className="border-b border-[#eadfda] bg-[#fffdf9]/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
@@ -9,7 +22,10 @@ export default function Navbar() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8d83ce]">Textbee gateway</p>
           </div>
         </div>
-        <span className="hidden rounded-full bg-[#e5f4ea] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#327052] sm:inline">SMS ready</span>
+        <div className="flex items-center gap-3">
+          <span className="hidden max-w-[220px] truncate text-sm text-[#746f86] md:inline" title={userEmail}>{userEmail}</span>
+          <button type="button" onClick={handleLogout} className="rounded-full border border-[#eadfda] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#746f86] transition hover:border-[#f06459] hover:text-[#d94d49]">Log out</button>
+        </div>
       </div>
     </header>
   );

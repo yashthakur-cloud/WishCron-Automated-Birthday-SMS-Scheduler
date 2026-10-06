@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { countryCallingCodes } from "../lib/countryCallingCodes";
+import { supabase } from "../lib/supabase-client";
 
 const initialForm = {
   sender_name: "",
@@ -14,7 +15,7 @@ const initialForm = {
   custom_message: ""
 };
 
-export default function ContactForm({ onContactAdded }) {
+export default function ContactForm({ userId, onContactAdded }) {
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,21 +43,18 @@ export default function ContactForm({ onContactAdded }) {
         throw new Error("Phone number must contain exactly 10 digits.");
       }
 
-      const response = await fetch("/api/contacts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          sender_name: senderName,
-          recipient_name: recipientName,
-          recipient_phone_local: phoneNumber,
-          recipient_phone: `+${countryCallingCodes.find((item) => item.country === form.country).callingCode}${phoneNumber}`
-        })
+      const { error } = await supabase.from("contacts").insert({
+        user_id: userId,
+        sender_name: senderName,
+        recipient_name: recipientName,
+        recipient_phone: `+${countryCallingCodes.find((item) => item.country === form.country).callingCode}${phoneNumber}`,
+        dob_month: Number(form.dob_month),
+        dob_day: Number(form.dob_day),
+        custom_message: form.custom_message.trim() || null
       });
-      const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || "Unable to save contact.");
+      if (error) {
+        throw new Error(error.message || "Unable to save contact.");
       }
 
       setForm(initialForm);
@@ -73,13 +71,13 @@ export default function ContactForm({ onContactAdded }) {
     "mt-2 w-full rounded-xl border border-[#e3d9d4] bg-[#fffdf9] px-3.5 py-3 text-sm text-[#27233b] outline-none transition placeholder:text-[#aaa2b1] focus:border-[#8d83ce] focus:ring-4 focus:ring-[#eee9ff]";
 
   return (
-    <form onSubmit={handleSubmit} className="rise-in rounded-[26px] border border-[#eadfda] bg-[#fffdf9] p-6 shadow-[0_18px_45px_rgba(61,43,74,0.08)] sm:p-7">
+    <form onSubmit={handleSubmit} className="rise-in min-w-0 rounded-[26px] border border-[#eadfda] bg-[#fffdf9] p-5 shadow-[0_18px_45px_rgba(61,43,74,0.08)] sm:p-7">
       <div className="mb-7 flex items-center gap-3 border-b border-dashed border-[#eadfda] pb-6">
         <div className="rounded-xl bg-[#eee9ff] p-2.5 text-[#665bb8]">
           <Plus size={20} />
         </div>
         <div>
-          <h2 className="font-serif text-xl font-bold text-[#27233b]">Add a birthday</h2>
+          <h2 className="font-serif text-lg font-bold text-[#27233b] sm:text-xl">Add a birthday</h2>
           <p className="text-sm text-[#746f86]">We&apos;ll send the wish at 8:00 AM IST.</p>
         </div>
       </div>

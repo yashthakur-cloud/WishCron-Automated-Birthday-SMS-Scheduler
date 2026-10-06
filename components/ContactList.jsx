@@ -1,23 +1,55 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase-client";
 
-export default function ContactList({ contacts, isLoading, onContactDeleted }) {
+export default function ContactList({ refreshKey, onContactDeleted }) {
+  const [contacts, setContacts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    async function loadContacts() {
+      setIsLoading(true);
+      setError("");
+      const { data, error: queryError } = await supabase
+        .from("contacts")
+        .select("id, sender_name, recipient_name, recipient_phone, dob_month, dob_day, custom_message, created_at")
+        .order("dob_month", { ascending: true })
+        .order("dob_day", { ascending: true })
+        .order("recipient_name", { ascending: true });
+
+      if (!isCurrent) return;
+      if (queryError) {
+        setError(queryError.message);
+        setContacts([]);
+      } else {
+        setContacts(data || []);
+      }
+      setIsLoading(false);
+    }
+
+    loadContacts();
+    return () => { isCurrent = false; };
+  }, [refreshKey]);
+
   async function deleteContact(id) {
     if (!window.confirm("Delete this birthday contact?")) return;
 
-    const response = await fetch(`/api/contacts/${id}`, { method: "DELETE" });
-    const result = await response.json();
-    if (!response.ok) {
-      window.alert(result.error || "Unable to delete contact.");
+    const { error: deleteError } = await supabase.from("contacts").delete().eq("id", id);
+    if (deleteError) {
+      window.alert(deleteError.message || "Unable to delete contact.");
       return;
     }
     await onContactDeleted();
   }
 
   return (
-    <section className="rise-in-delay overflow-hidden rounded-[26px] border border-[#eadfda] bg-[#fffdf9] shadow-[0_18px_45px_rgba(61,43,74,0.08)]">
-      <div className="flex items-end justify-between border-b border-dashed border-[#eadfda] px-6 py-6 sm:px-7">
+    <section className="rise-in-delay min-w-0 overflow-hidden rounded-[26px] border border-[#eadfda] bg-[#fffdf9] shadow-[0_18px_45px_rgba(61,43,74,0.08)]">
+      <div className="flex items-end justify-between border-b border-dashed border-[#eadfda] px-5 py-6 sm:px-7">
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-[0.18em] text-[#8d83ce]">Your little black book</p>
           <h2 className="font-serif text-2xl font-bold text-[#27233b]">Saved birthdays</h2>
@@ -27,6 +59,8 @@ export default function ContactList({ contacts, isLoading, onContactDeleted }) {
       </div>
       {isLoading ? (
         <p className="px-6 py-14 text-center text-sm font-semibold text-[#746f86]">Loading contacts...</p>
+      ) : error ? (
+        <p className="mx-6 my-6 rounded-xl bg-[#fff0ed] px-4 py-3 text-sm font-semibold text-[#c74646]">{error}</p>
       ) : contacts.length === 0 ? (
         <div className="px-6 py-14 text-center">
           <div className="mb-3 text-4xl" aria-hidden="true">🍰</div>

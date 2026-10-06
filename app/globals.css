@@ -15,6 +15,7 @@
 
 body {
   @apply min-h-screen antialiased;
+  overflow-x: hidden;
   color: var(--ink);
   background-color: #fffaf3;
   background-image:

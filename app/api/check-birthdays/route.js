@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertSupabaseConfig, supabase } from "../../../lib/supabase";
+import { assertSupabaseAdminConfig, supabaseAdmin } from "../../../lib/supabase-admin";
 
 const TEXTBEE_URL = "https://api.textbee.dev/api/v1/gateway/send-sms";
 
@@ -36,7 +36,7 @@ export async function GET(request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  assertSupabaseConfig();
+  assertSupabaseAdminConfig();
 
   if (!process.env.TEXTBEE_API_KEY || !process.env.TEXTBEE_DEVICE_ID) {
     return NextResponse.json(
@@ -46,7 +46,7 @@ export async function GET(request) {
   }
 
   const { year, month, day } = getIndiaDateParts();
-  const { data: contacts, error: queryError } = await supabase
+  const { data: contacts, error: queryError } = await supabaseAdmin
     .from("contacts")
     .select(
       "id, sender_name, recipient_name, recipient_phone, custom_message, last_sent_year"
@@ -85,7 +85,7 @@ export async function GET(request) {
       continue;
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from("contacts")
       .update({ last_sent_year: year })
       .eq("id", contact.id);

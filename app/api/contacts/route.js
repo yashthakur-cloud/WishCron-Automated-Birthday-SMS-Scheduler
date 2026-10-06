@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertSupabaseConfig, supabase } from "../../../lib/supabase";
+import { createSupabaseServerClient } from "../../../lib/supabase-server";
 
 const contactFields =
   "id, sender_name, recipient_name, recipient_phone, dob_month, dob_day, custom_message, created_at";
@@ -40,7 +40,10 @@ function validateContact(payload) {
 }
 
 export async function GET() {
-  assertSupabaseConfig();
+  const supabase = createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+
   const { data, error } = await supabase
     .from("contacts")
     .select(contactFields)
@@ -56,7 +59,10 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  assertSupabaseConfig();
+  const supabase = createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+
   let payload;
   try {
     payload = await request.json();
@@ -72,6 +78,7 @@ export async function POST(request) {
   const { data, error } = await supabase
     .from("contacts")
     .insert({
+      user_id: user.id,
       sender_name: payload.sender_name.trim(),
       recipient_name: payload.recipient_name.trim(),
       recipient_phone: payload.recipient_phone.trim(),
