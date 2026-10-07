@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase-client";
 
@@ -9,16 +9,28 @@ export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setMessage(new URLSearchParams(window.location.search).get("message") || "");
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     setIsSubmitting(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword(form);
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: form.email.trim().toLowerCase(),
+      password: form.password
+    });
     if (signInError) {
-      setError(signInError.message);
+      setError(
+        signInError.message.toLowerCase().includes("email not confirmed")
+          ? "Your email is not confirmed yet. Open the confirmation email from Supabase, click its link, then try again."
+          : signInError.message
+      );
       setIsSubmitting(false);
       return;
     }
@@ -45,7 +57,8 @@ export default function LoginPage() {
             Password
             <input className="mt-2 w-full rounded-xl border border-[#e3d9d4] bg-[#fffdf9] px-3.5 py-3 text-sm outline-none focus:border-[#8d83ce] focus:ring-4 focus:ring-[#eee9ff]" type="password" minLength="6" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
           </label>
-          {error && <p className="rounded-xl bg-[#fff0ed] px-3 py-2 text-sm font-semibold text-[#c74646]">{error}</p>}
+          {message && <p role="status" className="rounded-xl bg-[#edf9f0] px-3 py-2 text-sm font-semibold text-[#287a45]">{message}</p>}
+          {error && <p role="alert" className="rounded-xl bg-[#fff0ed] px-3 py-2 text-sm font-semibold text-[#c74646]">{error}</p>}
           <button className="w-full rounded-xl bg-[#f06459] px-4 py-3.5 text-sm font-bold text-white shadow-[0_5px_0_#d94d49] disabled:opacity-60" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>

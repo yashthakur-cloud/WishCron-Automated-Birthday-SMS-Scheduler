@@ -9,14 +9,19 @@ export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+    setSuccess("");
     setIsSubmitting(true);
 
-    const { data, error: signUpError } = await supabase.auth.signUp(form);
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: form.email.trim().toLowerCase(),
+      password: form.password
+    });
     if (signUpError) {
       setError(signUpError.message);
       setIsSubmitting(false);
@@ -26,7 +31,8 @@ export default function RegisterPage() {
     if (data.session) {
       router.replace("/dashboard");
     } else {
-      router.replace("/login?message=Check your email to confirm your account.");
+      setSuccess("Account created. Check your email and click the confirmation link before signing in.");
+      setIsSubmitting(false);
     }
     router.refresh();
   }
@@ -49,7 +55,8 @@ export default function RegisterPage() {
             Password
             <input className="mt-2 w-full rounded-xl border border-[#e3d9d4] bg-[#fffdf9] px-3.5 py-3 text-sm outline-none focus:border-[#8d83ce] focus:ring-4 focus:ring-[#eee9ff]" type="password" minLength="6" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
           </label>
-          {error && <p className="rounded-xl bg-[#fff0ed] px-3 py-2 text-sm font-semibold text-[#c74646]">{error}</p>}
+          {error && <p role="alert" className="rounded-xl bg-[#fff0ed] px-3 py-2 text-sm font-semibold text-[#c74646]">{error}</p>}
+          {success && <p role="status" className="rounded-xl bg-[#edf9f0] px-3 py-2 text-sm font-semibold text-[#287a45]">{success}</p>}
           <button className="w-full rounded-xl bg-[#f06459] px-4 py-3.5 text-sm font-bold text-white shadow-[0_5px_0_#d94d49] disabled:opacity-60" disabled={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Create account"}
           </button>
