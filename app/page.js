@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowRight, Check, Clock3, MessageSquare, Sparkles } from "lucide-react";
 import LandingMockup from "../components/LandingMockup";
 import { createSupabaseServerClient } from "../lib/supabase-server";
@@ -43,8 +42,6 @@ export default async function LandingPage() {
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (user) redirect("/dashboard");
-
   return (
     <main className="min-h-screen overflow-hidden">
       <header className="sticky top-0 z-50 border-b border-[#eadfda]/80 bg-[#fffaf3]/80 backdrop-blur-md">
@@ -59,7 +56,7 @@ export default async function LandingPage() {
           <nav className="flex items-center gap-3 sm:gap-6" aria-label="Main navigation">
             <a href="#how-it-works" className="hidden text-sm font-bold text-[#746f86] transition hover:text-[#d94d49] sm:inline">How it works</a>
             <a href="#faq" className="hidden text-sm font-bold text-[#746f86] transition hover:text-[#d94d49] sm:inline">FAQ</a>
-            <Link href="/login" className="rounded-full border border-[#eadfda] bg-[#fffdf9] px-4 py-2 text-sm font-bold text-[#4e485e] transition hover:border-[#f06459] hover:text-[#d94d49]">Sign in</Link>
+            <Link href={user ? "/dashboard" : "/login"} className="rounded-full border border-[#eadfda] bg-[#fffdf9] px-4 py-2 text-sm font-bold text-[#4e485e] transition hover:border-[#f06459] hover:text-[#d94d49]">{user ? "Dashboard" : "Sign in"}</Link>
           </nav>
         </div>
       </header>
@@ -70,8 +67,8 @@ export default async function LandingPage() {
           <h1 className="rise-in max-w-3xl font-serif text-5xl font-bold leading-[0.98] tracking-tight text-[#27233b] sm:text-7xl">Never Miss A <span className="text-[#d94d49]">Birthday</span> Again.</h1>
           <p className="rise-in mt-7 max-w-xl text-lg leading-8 text-[#746f86]">Schedule personalized birthday wishes once. WishCron automatically dispatches them via direct SMS on their special day—100% free.</p>
           <div className="rise-in mt-9 flex flex-col gap-4 sm:flex-row">
-            <Link href="/register" className="inline-flex items-center justify-center rounded-xl bg-[#f06459] px-6 py-4 text-sm font-bold text-white shadow-[0_5px_0_#d94d49] transition hover:-translate-y-0.5 hover:bg-[#e85a53]">Get Started Free <ArrowRight size={17} className="ml-2" /></Link>
-            <Link href="/login" className="inline-flex items-center justify-center rounded-xl border border-[#eadfda] bg-[#fffdf9] px-6 py-4 text-sm font-bold text-[#4e485e] transition hover:border-[#8d83ce] hover:text-[#665bb8]">Sign In</Link>
+            <Link href={user ? "/dashboard" : "/register"} className="inline-flex items-center justify-center rounded-xl bg-[#f06459] px-6 py-4 text-sm font-bold text-white shadow-[0_5px_0_#d94d49] transition hover:-translate-y-0.5 hover:bg-[#e85a53]">{user ? "Open Dashboard" : "Get Started Free"} <ArrowRight size={17} className="ml-2" /></Link>
+            <Link href={user ? "/dashboard" : "/login"} className="inline-flex items-center justify-center rounded-xl border border-[#eadfda] bg-[#fffdf9] px-6 py-4 text-sm font-bold text-[#4e485e] transition hover:border-[#8d83ce] hover:text-[#665bb8]">{user ? "Manage Wishes" : "Sign In"}</Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-[#746f86]">
             <span className="flex items-center gap-1.5"><Check size={14} className="text-[#327052]" /> No credit card</span>
