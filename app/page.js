@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check, Clock3, MessageSquare, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Clock3, MessageSquare, Quote, Sparkles, Star } from "lucide-react";
 import LandingMockup from "../components/LandingMockup";
 import { createSupabaseServerClient } from "../lib/supabase-server";
 
@@ -36,6 +36,12 @@ const faqs = [
   ["Can I edit custom wishes?", "Yes. Every contact can have its own custom message, and you can update the saved details from your dashboard."],
   ["Will a birthday message ever send twice?", "No. WishCron records the year after a successful delivery and skips that birthday for the rest of the same year."],
   ["Can I send wishes to international numbers?", "Yes. Choose the recipient's country when you add a contact. WishCron adds the correct country calling code before sending."],
+];
+
+const reviews = [
+  ["AK", "Aarav Kapoor", "Busy professional", "I used to remember birthdays late at night. WishCron makes the thoughtful thing automatic without making it feel robotic."],
+  ["NS", "Nisha Shah", "Family organizer", "The custom message is my favorite part. I can write something personal once and know it will reach my family on time."],
+  ["RM", "Rohan Mehta", "WishCron user", "The setup was simple, the dashboard is clear, and the morning delivery means I never have to scramble for a birthday message."],
 ];
 
 export default async function LandingPage() {
@@ -129,6 +135,34 @@ export default async function LandingPage() {
               <p className="max-w-2xl pt-3 text-sm leading-6 text-[#746f86]">{answer}</p>
             </details>
           ))}
+        </div>
+      </section>
+
+      <section id="reviews" className="border-t border-[#eadfda] bg-[#fff7e3] px-5 py-20 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 max-w-xl">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-[#d94d49]">A little love</p>
+            <h2 className="font-serif text-3xl font-bold leading-tight text-[#27233b] sm:text-4xl">Thoughtful words from thoughtful people.</h2>
+            <p className="mt-3 text-sm leading-6 text-[#746f86]">The small moments matter. WishCron helps make more of them happen.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {reviews.map(([initials, name, role, review]) => (
+              <article key={name} className="relative rounded-[22px] border border-[#eadfda] bg-[#fffdf9] p-6 shadow-[0_12px_30px_rgba(61,43,74,0.05)]">
+                <Quote size={28} className="absolute right-5 top-5 text-[#f4d6cf]" aria-hidden="true" />
+                <div className="flex gap-1 text-[#e9ae36]" aria-label="5 out of 5 stars">
+                  {Array.from({ length: 5 }, (_, index) => <Star key={index} size={15} fill="currentColor" />)}
+                </div>
+                <p className="mt-6 min-h-[120px] text-sm leading-6 text-[#4e485e]">&ldquo;{review}&rdquo;</p>
+                <div className="mt-6 flex items-center gap-3 border-t border-dashed border-[#eadfda] pt-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eee9ff] font-bold text-[#665bb8]">{initials}</div>
+                  <div>
+                    <p className="text-sm font-bold text-[#27233b]">{name}</p>
+                    <p className="text-xs text-[#746f86]">{role}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </main>
