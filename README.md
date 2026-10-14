@@ -160,6 +160,4 @@ This project does not currently include a license. Please contact the repository
 
 ---
 
-<p align="center">
-  Made with ❤️ to help people remember the moments that matter.
-</p>
+
